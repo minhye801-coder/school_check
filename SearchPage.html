@@ -40,7 +40,7 @@
     <div class="filter-group no-print">
         <div class="filter-item">
             <label>학교명 필수</label>
-            <input type="text" id="schoolInput" placeholder="예 : OO초등학교, OO중학교">
+            <input type="text" id="schoolInput" placeholder="예 : OO초등학교 OO중학교">
         </div>
         <div class="filter-item">
             <label>근무자 성명</label>
@@ -80,7 +80,7 @@
 </div>
 
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzH_cj31jHqw17b0JIN9P5Oai-2B-T0bpI_XxdHvaf5axrWmjBw6MXZeZ0jq7IyKpEP/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwVQJchGBc7ef-arIUvqDNNSMrFcegpEH2RDsUikG2iQCXtwwldeeOwocyRfSu_j9dB/exec";
 
     function parseDate(dateStr) {
         if(!dateStr) return null;
@@ -89,6 +89,15 @@
             return new Date(parts[0], parts[1] - 1, parts[2]);
         }
         return new Date(dateStr);
+    }
+
+    function getDirectImgUrl(driveUrl) {
+        if (!driveUrl) return "";
+        const fileId = driveUrl.match(/[\w-]{25,}/);
+        if (fileId) {
+            return `https://drive.google.com/thumbnail?id=${fileId[0]}&sz=w1000`;
+        }
+        return driveUrl;
     }
 
     async function fetchAndFilter() {
@@ -145,14 +154,16 @@
             filteredData.forEach(row => {
                 const tr = document.createElement('tr');
                 const cleanDate = row[0].split('오')[0].trim();
+                const userSigImg = getDirectImgUrl(row[4]);
+                const adminSigImg = getDirectImgUrl(row[5]);
                 
                 tr.innerHTML = `
                     <td>${cleanDate}</td>
                     <td>${row[1]}</td>
                     <td>${row[2]}</td>
                     <td>${row[3]}</td>
-                    <td><img src="${row[4]}" class="sig-img"></td>
-                    <td><img src="${row[5]}" class="sig-img"></td>
+                    <td><img src="${userSigImg}" class="sig-img" alt="근무자 서명"></td>
+                    <td><img src="${adminSigImg}" class="sig-img" alt="조리사 서명"></td>
                 `;
                 tbody.appendChild(tr);
             });
